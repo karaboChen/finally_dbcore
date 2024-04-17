@@ -29,9 +29,9 @@ public partial class testContext : DbContext
 
         modelBuilder.Entity<_3_line>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("3_line");
+            entity.HasKey(e => e.coli_id);
+
+            entity.ToTable("3_line");
 
             entity.Property(e => e.coli_id).HasMaxLength(5);
             entity.Property(e => e.name).HasMaxLength(10);

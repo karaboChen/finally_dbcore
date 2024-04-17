@@ -9,4 +9,11 @@
 
         public int  age { get; set; }
     }
+    public class  Line
+    {
+        public string name { get; set; }
+
+    }
+
+
 }

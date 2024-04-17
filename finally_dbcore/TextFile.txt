@@ -1,0 +1,84 @@
+﻿
+using Serilog.Events;
+using Serilog;
+using Serilog.Filters;
+using System.Net;
+using log;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("D:\\log\\init-log-.log",
+        rollingInterval: RollingInterval.Hour,  //每一小時重新產新新的檔案
+        retainedFileCountLimit: 720             //Log保留時間(24 hr * 30 Day=720)
+    )
+      //.WriteTo.Email(
+      //          from: "your-email@example.com",
+      //          to: "recipient@example.com",
+      //          host: "smtp.example.com",
+      //          networkCredentials: new System.Net.NetworkCredential("username", "password"),
+      //          mailSubject: "Error occurred in application"
+      //      )
+    .CreateBootstrapLogger();
+
+try
+{
+    int.Parse("aaaa");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+   .ReadFrom.Configuration(context.Configuration)  //從設定檔中讀取
+   .ReadFrom.Services(services)
+   .Enrich.FromLogContext()
+   .WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter())
+   .WriteTo.File(new Serilog.Formatting.Compact.CompactJsonFormatter(), "D:\\log\\test-.log",
+       rollingInterval: RollingInterval.Hour,
+       retainedFileCountLimit: 720)
+    .WriteTo.Logger(loggerConfiguration => loggerConfiguration
+        .Filter.ByIncludingOnly(Matching.FromSource("log.Controllers.WeatherForecastController"))
+        .WriteTo.File("logs/api-.log",
+            rollingInterval: RollingInterval.Hour, // 每小時一個檔案
+            retainedFileCountLimit: 24 * 30 // 最多保留 30 天份的 Log 檔案
+        )
+      )
+    );
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception er)
+{
+    Log.Fatal(er, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
+
+

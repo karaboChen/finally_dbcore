@@ -1,6 +1,7 @@
+using finally_dbcore.common;
 using finally_dbcore.Models.Road;
 using finally_dbcore.Models.test;
-using finally_dbcore.Services;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,12 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("TodoDatabase")))
 builder.Services.AddDbContext<RoadContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddScoped<TodoService>();
+builder.Services.¥\¯à();
+
+builder.Services.AddLogging(e => {
+    e.AddConsole();
+});
+
 
 
 builder.Services.AddCors(options =>
@@ -33,9 +39,9 @@ var app = builder.Build();
 
 app.UseCors();
 // Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
 
+app.¿ù»~ÄdºI();
 app.UseAuthorization();
 
 app.MapControllers();

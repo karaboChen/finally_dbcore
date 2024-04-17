@@ -1,4 +1,5 @@
 ﻿using finally_dbcore.Dto;
+using finally_dbcore.Models.test;
 using finally_dbcore.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,12 @@ namespace finally_dbcore.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly TodoService _TodoService;
-        public ValuesController(TodoService TodoService)
+        private readonly Todologic _TodoService;
+        public ValuesController(Todologic TodoService)
         {
             _TodoService = TodoService;
         }
+
 
         // GET: api/<ValuesController>
         [HttpGet("fa/get")]
@@ -23,17 +25,34 @@ namespace finally_dbcore.Controllers
             return Ok(result);
         }
 
-        // POST api/<ValuesController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
 
-        // PUT api/<ValuesController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
+        [HttpPost("fa/insert")]
+        public IActionResult Post([FromBody] Line value)
+        {
+            try
+            {
+                _TodoService.新增資料(value);
+                return Ok();    
+            }
+            catch (Exception ex)
+            {
+                var error = new
+                {
+                    message = "An error",
+                    reason = ex.Message,
+                    line = ex.StackTrace.Substring(ex.StackTrace.LastIndexOf(":line ") + 6)
+                };
+                return StatusCode(500, error);
+            }
+        }
+
+
+        [HttpPut("fa/update")]
+        public void Put( [FromBody] _3_line value)
+        {
+            _TodoService.修改資料(value);
+
+        }
 
         // DELETE api/<ValuesController>/5
         //[HttpDelete("{id}")]
